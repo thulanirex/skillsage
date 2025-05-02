@@ -28,8 +28,8 @@ export default function MobileNav({ items, user }: MobileNavProps) {
   return (
     <>
       {/* Mobile Header */}
-      <header className="bg-gradient-to-r from-dark-300 to-dark-200 shadow-lg md:hidden">
-        <div className="px-4 py-3 flex items-center justify-between">
+      <header className="bg-gradient-to-r from-dark-200 to-dark-100 shadow-lg md:hidden border-b border-primary-200/30">
+        <div className="px-4 py-4 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center">
             <div className="bg-gradient-to-r from-primary-200 to-primary-100 rounded-lg p-1.5 mr-2 shadow-md">
               <Image src="/logo.svg" alt="SkillSage Logo" width={24} height={24} />
@@ -39,11 +39,11 @@ export default function MobileNav({ items, user }: MobileNavProps) {
           
           {/* Mobile Menu Button */}
           <button 
-            className="text-light-300 hover:text-primary-100 focus:outline-none"
+            className="bg-primary-200 hover:bg-primary-100 text-dark-100 p-2 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary-100 focus:ring-offset-2 focus:ring-offset-dark-300"
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
             </svg>
           </button>
@@ -60,27 +60,27 @@ export default function MobileNav({ items, user }: MobileNavProps) {
           ></div>
           
           {/* Side Menu */}
-          <div className="fixed top-0 right-0 h-full w-72 bg-gradient-to-b from-dark-300 to-dark-200 shadow-xl p-5 overflow-y-auto">
+          <div className="fixed top-0 right-0 h-full w-72 bg-gradient-to-b from-dark-400 to-dark-300 shadow-xl p-5 overflow-y-auto border-l border-primary-200/30">
             <div className="flex justify-between items-center mb-8">
               <div className="flex items-center">
                 <div className="bg-gradient-to-r from-primary-200 to-primary-100 rounded-lg p-1.5 mr-2 shadow-md">
-                  <Image src="/logo.svg" alt="InterviewAce Logo" width={24} height={24} />
+                  <Image src="/logo.svg" alt="SkillSage Logo" width={24} height={24} />
                 </div>
-                <h2 className="text-xl font-bold text-white">Menu</h2>
+                <h2 className="text-xl font-bold text-white">SkillSage</h2>
               </div>
               <button 
-                className="text-light-300 hover:text-primary-100 focus:outline-none p-2 rounded-full hover:bg-dark-300/50 transition-colors"
+                className="bg-dark-200 hover:bg-dark-100 text-white p-2 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary-200 shadow-md"
                 onClick={toggleMenu}
                 aria-label="Close menu"
               >
-                {LucideIcons.X && <LucideIcons.X className="h-6 w-6" />}
+                {LucideIcons.X && <LucideIcons.X className="h-5 w-5" />}
               </button>
             </div>
             
             {/* Divider */}
-            <div className="mb-6 border-b border-dark-300/60"></div>
+            <div className="mb-6 border-b border-primary-200/20"></div>
             
-            <nav className="space-y-1.5 mb-8 px-2">
+            <nav className="space-y-2.5 mb-8 px-2">
               {items.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                 
@@ -88,22 +88,26 @@ export default function MobileNav({ items, user }: MobileNavProps) {
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center px-4 py-3.5 rounded-lg transition-all duration-200 group ${
+                    className={`flex items-center px-4 py-4 rounded-lg transition-all duration-200 group ${
                       isActive 
-                        ? "bg-gradient-to-r from-primary-200/30 to-primary-100/10 text-white font-medium shadow-sm" 
-                        : "text-gray-200 hover:bg-dark-300/70 hover:text-white"
+                        ? "bg-primary-200/30 text-white font-medium shadow-md border border-primary-200/30" 
+                        : "text-white hover:bg-dark-200 hover:text-white border border-dark-200/30"
                     }`}
                     onClick={toggleMenu}
                   >
                     {(() => {
                       const IconComponent = LucideIcons[item.icon as keyof typeof LucideIcons] as React.ComponentType<{ className?: string }>;
                       return IconComponent && (
-                        <div className={`flex items-center justify-center w-8 h-8 rounded-md mr-3 transition-colors ${isActive ? "bg-primary-200/30 text-white" : "bg-dark-300/80 text-gray-200 group-hover:text-white"}`}>
+                        <div className={`flex items-center justify-center w-9 h-9 rounded-md mr-3 transition-colors ${
+                          isActive 
+                            ? "bg-primary-200 text-dark-100" 
+                            : "bg-dark-200 text-white group-hover:bg-dark-100 group-hover:text-dark-300"
+                        }`}>
                           <IconComponent className="w-5 h-5" />
                         </div>
                       );
                     })()} 
-                    <span>{item.name}</span>
+                    <span className="font-medium">{item.name}</span>
                     
                     {/* Active indicator */}
                     {isActive && (
@@ -115,21 +119,21 @@ export default function MobileNav({ items, user }: MobileNavProps) {
             </nav>
             
             {/* Divider before user profile */}
-            <div className="mb-4 border-b border-dark-300/60"></div>
+            <div className="mb-4 border-b border-primary-200/20"></div>
             
             {/* User Profile in Mobile Menu */}
             {user && (
-              <div className="p-3 rounded-xl bg-dark-300/50 backdrop-blur-sm shadow-inner mx-2">
+              <div className="p-4 rounded-xl bg-dark-200 border border-primary-200/20 shadow-lg mx-2">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-200 to-primary-100 flex items-center justify-center text-dark-100 font-bold text-lg shadow-md">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-200 to-primary-100 flex items-center justify-center text-dark-100 font-bold text-xl shadow-md">
                     {user.name?.charAt(0) || "U"}
                   </div>
-                  <div className="ml-3 flex-1 truncate">
-                    <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                    <p className="text-xs text-light-400 truncate">{user.email}</p>
+                  <div className="ml-4 flex-1 truncate">
+                    <p className="text-base font-medium text-white truncate">{user.name}</p>
+                    <p className="text-sm text-gray-300 truncate">{user.email}</p>
                   </div>
-                  <button className="p-2 rounded-md hover:bg-dark-200 transition-colors" title="Settings">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-light-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <button className="p-2 bg-dark-300 hover:bg-dark-100 rounded-md transition-colors shadow-md" title="Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
