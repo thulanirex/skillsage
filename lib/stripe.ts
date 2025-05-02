@@ -4,8 +4,8 @@ import Stripe from 'stripe';
 const STRIPE_SECRET_KEY = 'sk_test_UHIrSchMy65wCHMMI5vUG7Wm00glpvGynv';
 export const STRIPE_PUBLISHABLE_KEY = 'pk_test_r1S7zTWUNFkmqzGEky6RSBxC002GJ9krGm';
 
-// Make sure we're in test mode
-const IS_TEST_MODE = true;
+// Test mode flag - used for configuration
+// const IS_TEST_MODE = true;
 
 export const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2025-04-30.basil', // Updated to the latest API version as of May 2025
@@ -103,7 +103,7 @@ export async function createPortalSession(
   return session;
 }
 
-export async function getSubscriptionStatus(userId: string) {
+export async function getSubscriptionStatus(_userId: string) {
   // This is a placeholder - in a real implementation, you would query your database
   // to get the Stripe customer ID for this user, then use the Stripe API to get
   // their subscription status

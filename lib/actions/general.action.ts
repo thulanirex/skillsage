@@ -195,7 +195,8 @@ export async function getUserInterviewsWithFeedback(
   const feedbackMap: Record<string, Feedback> = {};
   
   // Create a batch query to get all feedback for these interviews
-  const interviewIds = interviews.map(interview => interview.id);
+  // const interviewIds = interviews.map(interview => interview.id);
+  // Note: We're not using interviewIds directly as Firestore doesn't support array contains with other filters
   
   // Firestore doesn't support array contains with other filters, so we'll do multiple queries
   // Get all feedback where the user is the creator of the interview
