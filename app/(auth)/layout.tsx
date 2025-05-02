@@ -71,7 +71,7 @@ const AuthLayout = async ({ children }: { children: ReactNode }) => {
           </div>
           
           <div className="text-center text-gray-500 text-sm pt-8">
-            <p>© {new Date().getFullYear()} InterviewAce. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} SkillSage. All rights reserved.</p>
           </div>
         </div>
       </div>
