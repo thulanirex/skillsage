@@ -18,8 +18,23 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   webpack: (config) => {
-    // This is needed for importing the service account JSON file
-    config.resolve.fallback = { fs: false, path: false };
+    // Mark Firebase Admin SDK as server-only to prevent it from being bundled on the client
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      // These Node.js modules should not be bundled on the client
+      fs: false,
+      path: false,
+      crypto: false,
+      os: false,
+      http: false,
+      https: false,
+      zlib: false,
+      stream: false,
+      util: false,
+      url: false,
+      net: false,
+      tls: false,
+    };
     return config;
   },
 };
