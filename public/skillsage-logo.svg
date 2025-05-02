@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="#023979" />
+  
+  <!-- Phone/Call Icon -->
+  <path d="M320 352c-32 0-64-16-96-48s-48-64-48-96c0-8 1.6-14.4 4.8-19.2 3.2-4.8 8-9.6 14.4-14.4 4.8-3.2 9.6-4.8 12.8-4.8 1.6 0 3.2 0 4.8 1.6 1.6 1.6 3.2 3.2 4.8 6.4l16 28.8c1.6 3.2 1.6 6.4 1.6 9.6 0 3.2-1.6 6.4-3.2 9.6l-9.6 12.8c-1.6 1.6-1.6 3.2-1.6 4.8 0 1.6 0 3.2 0.8 4.8 1.6 3.2 4.8 8 9.6 12.8 4.8 4.8 9.6 9.6 14.4 12.8 1.6 1.6 3.2 1.6 4.8 1.6 1.6 0 3.2-0.8 4.8-1.6l12.8-9.6c3.2-1.6 6.4-3.2 9.6-3.2 3.2 0 6.4 0.8 9.6 1.6l28.8 16c3.2 1.6 4.8 3.2 6.4 4.8 1.6 1.6 1.6 3.2 1.6 4.8 0 4.8-1.6 9.6-4.8 14.4-4.8 6.4-9.6 11.2-14.4 14.4-4.8 3.2-11.2 4.8-19.2 4.8z" 
+        stroke="#FF914D" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  
+  <!-- AI Speech Bubbles -->
+  <circle cx="176" cy="176" r="48" fill="#FF914D" opacity="0.2" stroke="#FF914D" stroke-width="8" />
+  <circle cx="336" cy="176" r="32" fill="#FF914D" opacity="0.2" stroke="#FF914D" stroke-width="8" />
+  
+  <!-- Waveform/Sound Visualization -->
+  <path d="M176 144v64M192 152v48M208 160v32M224 168v16" 
+        stroke="#FF914D" stroke-width="8" stroke-linecap="round" />
+  <path d="M320 160v32M336 152v48M352 144v64" 
+        stroke="#FF914D" stroke-width="8" stroke-linecap="round" />
+</svg>
