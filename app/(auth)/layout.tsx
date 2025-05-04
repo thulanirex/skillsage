@@ -1,8 +1,10 @@
 import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 import { isAuthenticated } from "@/lib/actions/auth.action";
+import TextLogo from "@/components/TextLogo";
 
 const AuthLayout = async ({ children }: { children: ReactNode }) => {
   const isUserAuthenticated = await isAuthenticated();
@@ -16,6 +18,9 @@ const AuthLayout = async ({ children }: { children: ReactNode }) => {
         
         <div className="relative z-10 flex flex-col h-full justify-between">
           <div>
+            <Link href="/" className="inline-block mb-6">
+              <TextLogo />
+            </Link>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
               Ace Your Next <span className="text-primary-200">Interview</span>
             </h1>

@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 
+import TextLogo from "./TextLogo";
+
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -113,11 +115,8 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full max-w-md mx-auto space-y-8">
-      <div className="flex items-center justify-center space-x-2">
-        <div className="bg-gradient-to-r from-orange-100 to-orange-200 rounded-lg p-2 shadow-lg">
-          <Image src="/skillsage-logo.svg" alt="SkillSage Logo" width={32} height={32} className="text-white" />
-        </div>
-        <h1 className="text-2xl font-bold text-white">SkillSage</h1>
+      <div className="flex items-center justify-center mb-2">
+        <TextLogo />
       </div>
       
       <div className="w-full bg-dark-200/60 backdrop-blur-sm rounded-xl border border-dark-300/50 shadow-lg overflow-hidden">
