@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { User } from "firebase/auth";
+import TextLogo from "./TextLogo";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -56,10 +56,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="bg-gradient-to-r from-orange-100 to-orange-200 rounded-lg p-2 shadow-lg">
-              <Image src="/skillsage-logo.svg" alt="SkillSage Logo" width={24} height={24} className="text-white" />
-            </div>
-            <span className="text-xl font-bold text-white">SkillSage</span>
+            <TextLogo />
           </Link>
 
           {/* Desktop Navigation */}
@@ -100,12 +97,20 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               // User is logged in
-              <Link
-                href="/api/auth/sign-out"
-                className="bg-orange-100 hover:bg-orange-200 text-white font-medium rounded-lg px-4 py-2 transition-colors"
-              >
-                Sign Out
-              </Link>
+              <>
+                <Link
+                  href="/dashboard"
+                  className="text-white hover:text-primary-100 transition-colors"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/api/auth/sign-out"
+                  className="bg-orange-100 hover:bg-orange-200 text-white font-medium rounded-lg px-4 py-2 transition-colors"
+                >
+                  Sign Out
+                </Link>
+              </>
             ) : (
               // User is not logged in
               <>
@@ -205,13 +210,22 @@ const Navbar = () => {
               <div className="pt-4 flex flex-col space-y-3">
                 {user ? (
                   // User is logged in (mobile)
-                  <Link
-                    href="/api/auth/sign-out"
-                    className="bg-orange-100 hover:bg-orange-200 text-white font-medium rounded-lg px-4 py-2 transition-colors text-center"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Sign Out
-                  </Link>
+                  <>
+                    <Link 
+                      href="/dashboard" 
+                      className="text-white hover:text-primary-100 transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      href="/api/auth/sign-out"
+                      className="bg-orange-100 hover:bg-orange-200 text-white font-medium rounded-lg px-4 py-2 transition-colors text-center"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Sign Out
+                    </Link>
+                  </>
                 ) : (
                   // User is not logged in (mobile)
                   <>

@@ -18,15 +18,15 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
-              <div className="inline-block px-4 py-2 bg-blue-100/10 backdrop-blur-sm rounded-full border border-orange-100/20">
-                <span className="text-orange-100 font-medium text-sm">AI-Powered Interview Practice</span>
+              <div className="inline-block px-4 py-2 bg-orange-200/20 backdrop-blur-sm rounded-full border border-orange-100/30">
+                <span className="text-orange-100 font-semibold text-sm">AI-Powered Interview Practice</span>
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
                 Master Your <span className="text-gradient bg-gradient-to-r from-orange-100 to-blue-100">Interview Skills</span> with Confidence
               </h1>
               
-              <p className="text-gray-300 text-lg md:text-xl max-w-xl">
+              <p className="text-gray-100 text-lg md:text-xl max-w-xl leading-relaxed">
                 Practice unlimited job interviews with our AI interviewer. Get instant feedback, 
                 track your progress, and land your dream job with confidence.
               </p>
@@ -113,7 +113,7 @@ export default function LandingPage() {
                             <line x1="15" y1="9" x2="15.01" y2="9"></line>
                           </svg>
                         </div>
-                        <div className="bg-dark-200/80 rounded-lg rounded-tl-none p-3 text-gray-300 text-sm flex-1">
+                        <div className="bg-dark-200/90 rounded-lg rounded-tl-none p-3 text-gray-100 text-sm flex-1 border border-dark-300/50">
                           <p className="font-medium text-white mb-1">AI Interviewer</p>
                           <p>That sounds interesting. What specific challenges did you face during the migration process?</p>
                         </div>
@@ -147,7 +147,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-2 bg-primary-200/10 backdrop-blur-sm rounded-full border border-primary-200/20 mb-4">
-              <span className="text-primary-100 font-medium text-sm">Why Choose SkillSage</span>
+              <span className="text-primary-200 font-medium text-sm">Why Choose SkillSage</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Everything You Need to Ace Your Interviews</h2>
             <p className="text-gray-300 text-lg max-w-3xl mx-auto">
@@ -170,7 +170,7 @@ export default function LandingPage() {
                 creating a realistic interview experience. Choose from different roles, industries, and difficulty levels.
               </p>
               <div className="mt-6 pt-6 border-t border-dark-300/30">
-                <Link href="/sign-up" className="text-primary-100 hover:text-primary-200 font-medium flex items-center transition-colors">
+                <Link href="/sign-up" className="text-primary-200 hover:text-primary-100 font-medium flex items-center transition-colors">
                   <span>Try an interview</span>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -193,7 +193,7 @@ export default function LandingPage() {
                 and specific areas for improvement. Our AI provides actionable insights to help you improve.
               </p>
               <div className="mt-6 pt-6 border-t border-dark-300/30">
-                <Link href="/sign-up" className="text-primary-100 hover:text-primary-200 font-medium flex items-center transition-colors">
+                <Link href="/sign-up" className="text-primary-200 hover:text-primary-100 font-medium flex items-center transition-colors">
                   <span>See sample feedback</span>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -211,12 +211,12 @@ export default function LandingPage() {
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-white mb-4 group-hover:text-primary-100 transition-colors">Progress Tracking & Analytics</h3>
-              <p className="text-gray-300 leading-relaxed">
+              <p className="text-gray-100 leading-relaxed">
                 Monitor your improvement over time with detailed analytics and performance metrics. Track your progress across 
                 different interview types and skills to focus your preparation where it matters most.
               </p>
               <div className="mt-6 pt-6 border-t border-dark-300/30">
-                <Link href="/sign-up" className="text-primary-100 hover:text-primary-200 font-medium flex items-center transition-colors">
+                <Link href="/sign-up" className="text-primary-200 hover:text-primary-100 font-medium flex items-center transition-colors">
                   <span>View analytics demo</span>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -308,7 +308,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h4 className="text-lg font-bold text-white">Sarah Johnson</h4>
-                  <p className="text-gray-400 text-sm">Software Engineer at Google</p>
+                  <p className="text-gray-200 text-sm">Software Engineer at Google</p>
                 </div>
               </div>
               
@@ -322,7 +322,7 @@ export default function LandingPage() {
                 </div>
               </div>
               
-              <p className="text-gray-300 leading-relaxed mb-6">
+              <p className="text-gray-100 leading-relaxed mb-6">
                 "SkillSage was a game-changer for my job search. After practicing with the AI interviewer for just two weeks, I felt so much more confident in my actual interviews. The detailed feedback helped me identify and fix weaknesses in my responses that I wasn't even aware of."
               </p>
               

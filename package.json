@@ -20,6 +20,7 @@
     "@radix-ui/react-switch": "^1.2.2",
     "@radix-ui/react-tabs": "^1.1.9",
     "@vapi-ai/web": "^2.2.4",
+    "@vercel/analytics": "^1.5.0",
     "ai": "^4.1.61",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

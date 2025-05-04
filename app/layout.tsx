@@ -2,6 +2,7 @@ import { Toaster } from "sonner";
 import type { Metadata } from "next";
 import { Mona_Sans } from "next/font/google";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 
 import "./globals.css";
 
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body className={`${monaSans.className} ${inter.className} antialiased pattern`}>
         <Toaster richColors />
         {children}
+        <Analytics />
       </body>
     </html>
   );
