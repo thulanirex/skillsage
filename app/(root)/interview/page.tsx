@@ -7,6 +7,8 @@ import { formatDistanceToNow } from "date-fns";
 
 const Page = async () => {
   const user = await getCurrentUser();
+  // Log the user ID for debugging
+  console.log('User ID from getCurrentUser:', user?.id);
   const interviews = await getInterviewsByUserId(user?.id || "");
 
   return (

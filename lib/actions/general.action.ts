@@ -160,19 +160,68 @@ export async function getInterviewsByUserId(
 ): Promise<Interview[] | null> {
   // Return empty array if userId is undefined
   if (!userId) {
+    console.log('getInterviewsByUserId: userId is undefined, returning empty array');
     return [];
   }
 
-  const interviews = await db
-    .collection("interviews")
-    .where("userId", "==", userId)
-    .orderBy("createdAt", "desc")
-    .get();
+  console.log(`getInterviewsByUserId: Fetching interviews for userId: ${userId}`);
 
-  return interviews.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as Interview[];
+  try {
+    // First, let's check if there are any interviews in the collection at all
+    const allInterviews = await db.collection("interviews").limit(5).get();
+    console.log(`Total interviews in collection (sample): ${allInterviews.size}`);
+    
+    if (allInterviews.size > 0) {
+      // Log a sample interview to see its structure
+      const sampleDoc = allInterviews.docs[0];
+      const sampleData = sampleDoc.data();
+      console.log('Sample interview data structure:', {
+        id: sampleDoc.id,
+        userId: sampleData.userId || 'not found',
+        userid: sampleData.userid || 'not found', // Check for lowercase variant
+        role: sampleData.role,
+        createdAt: sampleData.createdAt
+      });
+    }
+
+    // Now perform the actual query
+    const interviews = await db
+      .collection("interviews")
+      .where("userId", "==", userId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    console.log(`Found ${interviews.size} interviews for userId: ${userId}`);
+
+    // If no interviews found with camelCase userId, try with lowercase
+    if (interviews.size === 0) {
+      console.log('No interviews found with camelCase userId, trying lowercase userid');
+      const interviewsAlt = await db
+        .collection("interviews")
+        .where("userid", "==", userId)
+        .orderBy("createdAt", "desc")
+        .get();
+
+      console.log(`Found ${interviewsAlt.size} interviews for lowercase userid: ${userId}`);
+      
+      if (interviewsAlt.size > 0) {
+        return interviewsAlt.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          // Normalize the field name to camelCase for consistency
+          userId: doc.data().userid
+        })) as Interview[];
+      }
+    }
+
+    return interviews.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Interview[];
+  } catch (error) {
+    console.error('Error in getInterviewsByUserId:', error);
+    return [];
+  }
 }
 
 // Get all interviews created by a user and all feedback for those interviews
@@ -181,37 +230,99 @@ export async function getUserInterviewsWithFeedback(
 ): Promise<{ interviews: Interview[], feedbackMap: Record<string, Feedback> }> {
   // Return empty data if userId is undefined
   if (!userId) {
+    console.log('getUserInterviewsWithFeedback: userId is undefined, returning empty data');
     return { interviews: [], feedbackMap: {} };
   }
 
-  // Get all interviews created by the user
-  const interviews = await getInterviewsByUserId(userId);
+  console.log(`getUserInterviewsWithFeedback: Fetching interviews for userId: ${userId}`);
+
+  try {
+    // First, check if there are any interviews in the collection at all
+    const allInterviews = await db.collection("interviews").limit(5).get();
+    console.log(`Total interviews in collection (sample): ${allInterviews.size}`);
+    
+    if (allInterviews.size > 0) {
+      // Log a sample interview to see its structure
+      const sampleDoc = allInterviews.docs[0];
+      const sampleData = sampleDoc.data();
+      console.log('Sample interview data structure:', {
+        id: sampleDoc.id,
+        userId: sampleData.userId || 'not found',
+        userid: sampleData.userid || 'not found', // Check for lowercase variant
+        role: sampleData.role,
+        createdAt: sampleData.createdAt
+      });
+    }
+
+    // Get interviews with camelCase userId field
+    const camelCaseInterviews = await db
+      .collection("interviews")
+      .where("userId", "==", userId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    console.log(`Found ${camelCaseInterviews.size} interviews with camelCase userId: ${userId}`);
+
+    // Get interviews with lowercase userid field
+    const lowercaseInterviews = await db
+      .collection("interviews")
+      .where("userid", "==", userId)
+      .orderBy("createdAt", "desc")
+      .get();
+
+    console.log(`Found ${lowercaseInterviews.size} interviews with lowercase userid: ${userId}`);
+
+    // Combine the results
+    const allUserInterviews: Interview[] = [];
+
+    // Add camelCase userId interviews
+    camelCaseInterviews.forEach(doc => {
+      allUserInterviews.push({
+        id: doc.id,
+        ...doc.data(),
+      } as Interview);
+    });
+
+    // Add lowercase userid interviews with normalized field name
+    lowercaseInterviews.forEach(doc => {
+      const data = doc.data();
+      allUserInterviews.push({
+        id: doc.id,
+        ...data,
+        userId: data.userid, // Normalize the field name to camelCase
+      } as Interview);
+    });
+
+    console.log(`Combined total: ${allUserInterviews.length} interviews`);
+
+    // If no interviews found, return empty data
+    if (allUserInterviews.length === 0) {
+      console.log('No interviews found for this user');
+      return { interviews: [], feedbackMap: {} };
+    }
   
-  if (!interviews || interviews.length === 0) {
+    // Get all feedback for these interviews
+    const feedbackMap: Record<string, Feedback> = {};
+    
+    // Get all feedback where the user is the creator of the interview
+    const feedbackSnapshot = await db
+      .collection("feedback")
+      .where("userId", "==", userId)
+      .get();
+      
+    console.log(`Found ${feedbackSnapshot.size} feedback items for userId: ${userId}`);
+      
+    // Process the feedback
+    feedbackSnapshot.forEach(doc => {
+      const feedback = { id: doc.id, ...doc.data() } as Feedback;
+      feedbackMap[feedback.interviewId] = feedback;
+    });
+    
+    return { interviews: allUserInterviews, feedbackMap };
+  } catch (error) {
+    console.error('Error in getUserInterviewsWithFeedback:', error);
     return { interviews: [], feedbackMap: {} };
   }
-  
-  // Get all feedback for these interviews
-  const feedbackMap: Record<string, Feedback> = {};
-  
-  // Create a batch query to get all feedback for these interviews
-  // const interviewIds = interviews.map(interview => interview.id);
-  // Note: We're not using interviewIds directly as Firestore doesn't support array contains with other filters
-  
-  // Firestore doesn't support array contains with other filters, so we'll do multiple queries
-  // Get all feedback where the user is the creator of the interview
-  const feedbackSnapshot = await db
-    .collection("feedback")
-    .where("userId", "==", userId)
-    .get();
-    
-  // Process the feedback
-  feedbackSnapshot.forEach(doc => {
-    const feedback = { id: doc.id, ...doc.data() } as Feedback;
-    feedbackMap[feedback.interviewId] = feedback;
-  });
-  
-  return { interviews, feedbackMap };
 }
 
 // Update the privacy settings of an interview
