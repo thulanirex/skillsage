@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import TextLogo from "./TextLogo";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -11,12 +11,9 @@ const Footer = () => {
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="bg-gradient-to-r from-orange-100 to-orange-200 rounded-lg p-2 shadow-lg">
-                <Image src="/skillsage-logo.svg" alt="SkillSage Logo" width={24} height={24} className="text-white" />
-              </div>
-              <span className="text-xl font-bold text-white">SkillSage</span>
+              <TextLogo />
             </div>
-            <p className="text-gray-400 text-sm mt-4 max-w-xs">
+            <p className="text-gray-200 text-sm mt-4 max-w-xs leading-relaxed">
               AI-powered interview preparation platform to help you land your dream job with confidence.
             </p>
             <div className="flex space-x-4 mt-6">

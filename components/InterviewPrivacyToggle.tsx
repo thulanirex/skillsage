@@ -46,15 +46,18 @@ export default function InterviewPrivacyToggle({
     }
   };
 
+  // Create a unique ID using both interviewId and userId to prevent duplicate keys
+  const uniqueId = `privacy-${interviewId}-${userId}`;
+  
   return (
     <div className="flex items-center space-x-2">
       <Switch 
-        id={`privacy-${interviewId}`}
+        id={uniqueId}
         checked={isPublic}
         onCheckedChange={handleToggle}
         disabled={isUpdating}
       />
-      <Label htmlFor={`privacy-${interviewId}`} className="text-sm text-gray-300">
+      <Label htmlFor={uniqueId} className="text-sm text-gray-300">
         {isPublic ? "Public" : "Private"}
       </Label>
     </div>

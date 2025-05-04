@@ -1,5 +1,4 @@
 // app/(root)/layout.tsx
-import Image from "next/image";
 import Link from "next/link";
 import { ReactNode } from "react";
 import { redirect } from "next/navigation";
@@ -7,6 +6,7 @@ import { isAuthenticated, getCurrentUser } from "@/lib/actions/auth.action";
 import UserProfileDropdown from "@/components/UserProfileDropdown";
 import SidebarNav from "@/components/SidebarNav";
 import MobileNav from "@/components/MobileNav";
+import TextLogo from "@/components/TextLogo";
 
 // We'll use icon names as strings instead of importing the components directly
 // This avoids the server component to client component serialization issue
@@ -35,10 +35,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
           {/* Logo */}
           <div className="flex items-center justify-center px-4 mb-10">
             <Link href="/dashboard" className="flex items-center">
-              <div className="bg-gradient-to-r from-primary-200 to-primary-100 rounded-lg p-2 mr-3 shadow-lg">
-                <Image src="/logo.svg" alt="SkillSage Logo" width={32} height={32} className="text-white" />
-              </div>
-              <h2 className="text-2xl font-bold text-white">SkillSage</h2>
+              <TextLogo />
             </Link>
           </div>
           
@@ -77,7 +74,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
                 </div>
                 <div className="ml-3 flex-1 truncate">
                   <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                  <p className="text-xs text-light-400 truncate">{user.email}</p>
+                  <p className="text-xs text-gray-200 truncate">{user.email}</p>
                 </div>
                 <button className="p-2 rounded-md hover:bg-dark-200 transition-colors" title="Settings">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-light-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -31,12 +31,12 @@ export default function SidebarNav({ items }: SidebarNavProps) {
             href={item.href}
             className={`flex items-center px-4 py-3.5 rounded-lg transition-all duration-200 group ${
               isActive 
-                ? "bg-gradient-to-r from-primary-200/30 to-primary-100/10 text-white font-medium shadow-sm" 
-                : "text-gray-200 hover:bg-dark-300/70 hover:text-white"
+                ? "bg-gradient-to-r from-primary-200/40 to-primary-200/20 text-white font-medium shadow-sm" 
+                : "text-gray-100 hover:bg-dark-300/70 hover:text-white"
             }`}
           >
             {IconComponent && (
-              <div className={`flex items-center justify-center w-8 h-8 rounded-md mr-3 transition-colors ${isActive ? "bg-primary-200/30 text-white" : "bg-dark-300/80 text-gray-200 group-hover:text-white"}`}>
+              <div className={`flex items-center justify-center w-8 h-8 rounded-md mr-3 transition-colors ${isActive ? "bg-primary-200/40 text-white" : "bg-dark-300/80 text-gray-100 group-hover:text-white"}`}>
                 <IconComponent className="w-5 h-5" />
               </div>
             )}
