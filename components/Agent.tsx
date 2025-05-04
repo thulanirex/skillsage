@@ -94,13 +94,12 @@ const Agent = ({
       if (error.message && error.message.includes('Meeting ended due to ejection')) {
         console.log('Interview generation completed, handling graceful disconnection');
         
-        // If we have a created interview ID, show the success modal
-        if (createdInterviewId) {
-          setShowSuccessModal(true);
-        }
+        // Always show the success modal when the interview is generated
+        // Even if we don't have the interviewId yet, it's still created in the database
+        setShowSuccessModal(true);
         
-        // Set call status to finished to trigger the useEffect that handles post-interview actions
-        setCallStatus(CallStatus.FINISHED);
+        // Don't set call status to finished yet - let the user see the success modal
+        // The user will click a button in the modal to navigate away
       } else {
         // Only log non-ejection errors
         console.log("Error:", error);
@@ -115,10 +114,11 @@ const Agent = ({
           (message.includes('Meeting ended due to ejection') || 
            (error && error.message && error.message.includes('Meeting ended due to ejection')))) {
         console.log('Suppressed WebSocket ejection error');
-        // If we have a created interview ID, show the success modal
-        if (createdInterviewId) {
-          setShowSuccessModal(true);
-        }
+        
+        // Always show the success modal when we get an ejection error
+        // This is a sign that the interview was created successfully
+        setShowSuccessModal(true);
+        
         // Return true to prevent the error from being logged to the console
         return true;
       }
@@ -173,13 +173,9 @@ const Agent = ({
 
     if (callStatus === CallStatus.FINISHED) {
       if (type === "generate") {
-        // Instead of redirecting immediately, show the success modal
-        if (createdInterviewId) {
-          setShowSuccessModal(true);
-        } else {
-          // If no interview ID was captured, redirect to dashboard
-          router.push("/dashboard");
-        }
+        // Always show the success modal when the interview is finished
+        // Don't redirect automatically - let the user click a button in the modal
+        setShowSuccessModal(true);
       } else {
         handleGenerateFeedback(messages);
       }
