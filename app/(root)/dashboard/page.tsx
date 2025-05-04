@@ -407,7 +407,7 @@ export default async function Dashboard() {
           </div>
           {hasReadyToTakeInterviews && (
             <Button asChild variant="outline" className="text-sm h-9 px-3 border-dark-300 text-gray-300 hover:text-white">
-              <Link href="/interview">Browse All</Link>
+              <Link href="/my-interviews">Browse All</Link>
             </Button>
           )}
         </div>
