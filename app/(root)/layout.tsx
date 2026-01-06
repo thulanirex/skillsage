@@ -7,6 +7,7 @@ import UserProfileDropdown from "@/components/UserProfileDropdown";
 import SidebarNav from "@/components/SidebarNav";
 import MobileNav from "@/components/MobileNav";
 import TextLogo from "@/components/TextLogo";
+import CreditTracker from "@/components/CreditTracker";
 
 // We'll use icon names as strings instead of importing the components directly
 // This avoids the server component to client component serialization issue
@@ -45,8 +46,15 @@ const Layout = async ({ children }: { children: ReactNode }) => {
           {/* Navigation Links - Using SidebarNav component */}
           <SidebarNav items={navItems} />
           
-          {/* Divider before user profile */}
+          {/* Divider before credits */}
           <div className="mx-6 mt-auto mb-4 border-b border-dark-300/60"></div>
+          
+          {/* Credit Tracker in Sidebar */}
+          {user?.id && (
+            <div className="px-6 mb-4">
+              <CreditTracker userId={user.id} compact />
+            </div>
+          )}
           
           {/* Logout Button */}
           <form action="/api/auth/signout" method="post" className="px-6 mb-6">

@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import InterviewCard from "@/components/InterviewCard";
+import CreditTracker from "@/components/CreditTracker";
 
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
@@ -153,7 +154,10 @@ export default async function Dashboard() {
       </header>
 
       {/* Metrics Section */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Credit Tracker */}
+        <CreditTracker userId={user?.id || ""} />
+
         {/* Total Interviews */}
         <div className="bg-dark-200/60 backdrop-blur-sm rounded-xl p-6 border border-dark-300/50 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">

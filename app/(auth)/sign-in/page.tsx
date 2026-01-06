@@ -1,7 +1,7 @@
-import AuthForm from "@/components/AuthForm";
+import AuthFormWrapper from "@/components/AuthFormWrapper";
 
 const Page = () => {
-  return <AuthForm type="sign-in" />;
+  return <AuthFormWrapper type="sign-in" />;
 };
 
 export default Page;

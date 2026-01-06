@@ -271,6 +271,47 @@ export async function getUserInterviewsWithFeedback(
       .get();
 
     console.log(`Found ${lowercaseInterviews.size} interviews with lowercase userid: ${userId}`);
+    
+    // Also check for any interviews with template literal userId values
+    // This is to find interviews that might have been created with the placeholder
+    console.log('Checking for interviews with template literal userId...');
+    const templateInterviews = await db
+      .collection("interviews")
+      .orderBy("createdAt", "desc")
+      .limit(20)
+      .get();
+    
+    // Filter locally for template literals
+    const templatesFound = templateInterviews.docs.filter(doc => {
+      const data = doc.data();
+      return (
+        (data.userId && typeof data.userId === 'string' && data.userId.includes('{{')) ||
+        (data.userid && typeof data.userid === 'string' && data.userid.includes('{{'))
+      );
+    });
+    
+    console.log(`Found ${templatesFound.length} interviews with template literal userId`);
+    if (templatesFound.length > 0) {
+      console.log('Template literal interviews:', templatesFound.map(doc => ({
+        id: doc.id,
+        userId: doc.data().userId,
+        userid: doc.data().userid
+      })));
+      
+      // Fix the template literal interviews by updating them with the correct userId
+      console.log('Attempting to fix template literal interviews...');
+      for (const doc of templatesFound) {
+        try {
+          await db.collection("interviews").doc(doc.id).update({
+            userId: userId,
+            userid: userId
+          });
+          console.log(`Fixed interview ${doc.id} with correct userId: ${userId}`);
+        } catch (error) {
+          console.error(`Failed to fix interview ${doc.id}:`, error);
+        }
+      }
+    }
 
     // Combine the results
     const allUserInterviews: Interview[] = [];
@@ -292,8 +333,36 @@ export async function getUserInterviewsWithFeedback(
         userId: data.userid, // Normalize the field name to camelCase
       } as Interview);
     });
+    
+    // Also include any template literal interviews that we found and fixed
+    // This ensures they show up immediately without waiting for a page refresh
+    for (const doc of templatesFound) {
+      // Check if this interview is already included
+      const alreadyIncluded = allUserInterviews.some(interview => interview.id === doc.id);
+      if (!alreadyIncluded) {
+        const data = doc.data();
+        // Add it with the correct userId
+        // Make sure we have all the required fields for an Interview type
+        const interviewData = {
+          id: doc.id,
+          ...data,
+          userId: userId, // Use the current user's ID
+          userid: userId,
+          role: data.role || 'Software Engineer',
+          type: data.type || 'mixed',
+          techstack: data.techstack || ['JavaScript'],
+          questions: data.questions || [],
+          createdAt: data.createdAt || new Date().toISOString()
+        } as Interview;
+        allUserInterviews.push(interviewData);
+        console.log(`Added fixed template interview ${doc.id} to results`);
+      }
+    }
 
     console.log(`Combined total: ${allUserInterviews.length} interviews`);
+    
+    // Log the IDs of all interviews for debugging
+    console.log('All interview IDs:', allUserInterviews.map(interview => interview.id));
 
     // If no interviews found, return empty data
     if (allUserInterviews.length === 0) {

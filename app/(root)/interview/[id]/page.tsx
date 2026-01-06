@@ -13,13 +13,13 @@ import DisplayTechIcons from "@/components/DisplayTechIcons";
 import { formatDistanceToNow } from "date-fns";
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 const InterviewDetails = async ({ params }: RouteParams) => {
-  const { id } = params;
+  const { id } = await params;
 
   const user = await getCurrentUser();
   if (!user) redirect("/sign-in");
@@ -159,7 +159,6 @@ const InterviewDetails = async ({ params }: RouteParams) => {
             type="interview"
             questions={interview.questions}
             feedbackId={feedback?.id}
-            profileImage={user?.profileURL}
           />
         </div>
       </div>

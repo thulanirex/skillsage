@@ -408,11 +408,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-2 bg-primary-200/10 backdrop-blur-sm rounded-full border border-primary-200/20 mb-4">
-              <span className="text-primary-100 font-medium text-sm">Simple Pricing</span>
+              <span className="text-primary-100 font-medium text-sm">Simple Credit-Based Pricing</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Plans for Every Stage of Your Career</h2>
             <p className="text-gray-300 text-lg max-w-3xl mx-auto">
-              Choose the plan that fits your needs. All plans include unlimited access to our AI interviewer.
+              Choose the plan that fits your needs. <span className="text-primary-200 font-medium">1 credit = 5 minutes</span> of interview time.
             </p>
           </div>
           
@@ -422,9 +422,12 @@ export default function LandingPage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/10 to-blue-500/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
               
               <h3 className="text-xl font-bold text-white mb-2">Free</h3>
-              <div className="flex items-end mb-6">
+              <div className="flex items-end mb-2">
                 <span className="text-4xl font-bold text-white">$0</span>
                 <span className="text-gray-400 ml-2 mb-1">/month</span>
+              </div>
+              <div className="mb-6">
+                <span className="inline-block bg-dark-300/80 text-primary-200 text-sm font-medium px-3 py-1 rounded-full">1 credit (5 mins)</span>
               </div>
               
               <ul className="space-y-4 mb-8">
@@ -432,7 +435,7 @@ export default function LandingPage() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-gray-300">3 AI interviews per month</span>
+                  <span className="text-gray-300">1 AI interview session per month</span>
                 </li>
                 <li className="flex items-start">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
@@ -444,7 +447,7 @@ export default function LandingPage() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-gray-300">Standard interview questions</span>
+                  <span className="text-gray-300">Limited question types</span>
                 </li>
                 <li className="flex items-start opacity-50">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
@@ -455,22 +458,70 @@ export default function LandingPage() {
               </ul>
               
               <Link href="/sign-up" className="block text-center bg-dark-300/80 hover:bg-dark-300 text-white border border-dark-300/50 font-medium rounded-lg px-6 py-3 transition-all">
+                Get Started Free
+              </Link>
+            </div>
+            
+            {/* Standard Plan */}
+            <div className="bg-dark-200/60 backdrop-blur-sm rounded-xl border border-dark-300/50 p-8 shadow-lg hover:shadow-xl transition-all relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-200/10 to-primary-300/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
+              
+              <h3 className="text-xl font-bold text-white mb-2">Standard</h3>
+              <div className="flex items-end mb-2">
+                <span className="text-4xl font-bold text-white">$9.99</span>
+                <span className="text-gray-400 ml-2 mb-1">/month</span>
+              </div>
+              <div className="mb-6">
+                <span className="inline-block bg-primary-200/20 text-primary-200 text-sm font-medium px-3 py-1 rounded-full">5 credits (25 mins)</span>
+              </div>
+              
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-gray-300">5 AI interview sessions per month</span>
+                </li>
+                <li className="flex items-start">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-gray-300">Detailed feedback</span>
+                </li>
+                <li className="flex items-start">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-gray-300">All question types</span>
+                </li>
+                <li className="flex items-start">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-gray-300">Interview history</span>
+                </li>
+              </ul>
+              
+              <Link href="/sign-up" className="block text-center bg-dark-300/80 hover:bg-dark-300 text-white border border-dark-300/50 font-medium rounded-lg px-6 py-3 transition-all">
                 Get Started
               </Link>
             </div>
             
-            {/* Pro Plan */}
+            {/* Professional Plan */}
             <div className="bg-dark-200/60 backdrop-blur-sm rounded-xl border border-primary-200/30 p-8 shadow-lg hover:shadow-xl transition-all relative overflow-hidden group transform scale-105 z-10">
               <div className="absolute -top-6 -right-6 w-32 h-32 bg-gradient-to-br from-primary-200/20 to-primary-300/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
               
               <div className="absolute top-0 right-0 bg-primary-200 text-dark-100 text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">
-                POPULAR
+                BEST VALUE
               </div>
               
-              <h3 className="text-xl font-bold text-white mb-2">Pro</h3>
-              <div className="flex items-end mb-6">
-                <span className="text-4xl font-bold text-white">$19</span>
+              <h3 className="text-xl font-bold text-white mb-2">Professional</h3>
+              <div className="flex items-end mb-2">
+                <span className="text-4xl font-bold text-white">$19.99</span>
                 <span className="text-gray-400 ml-2 mb-1">/month</span>
+              </div>
+              <div className="mb-6">
+                <span className="inline-block bg-primary-200/30 text-primary-100 text-sm font-medium px-3 py-1 rounded-full">15 credits (75 mins)</span>
               </div>
               
               <ul className="space-y-4 mb-8">
@@ -478,61 +529,19 @@ export default function LandingPage() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-gray-300">Unlimited SkillSage interviews</span>
+                  <span className="text-gray-300">15 AI interview sessions per month</span>
                 </li>
                 <li className="flex items-start">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-gray-300">Detailed feedback & scoring</span>
+                  <span className="text-gray-300">Detailed feedback & analytics</span>
                 </li>
                 <li className="flex items-start">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                  <span className="text-gray-300">Company-specific questions</span>
-                </li>
-                <li className="flex items-start">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-300">Performance analytics</span>
-                </li>
-              </ul>
-              
-              <Link href="/sign-up" className="block text-center bg-gradient-to-r from-primary-200 to-primary-300 hover:from-primary-300 hover:to-primary-200 text-dark-100 font-medium rounded-lg px-6 py-3 transition-all shadow-lg hover:shadow-primary-200/20 hover:shadow-xl">
-                Get Started
-              </Link>
-            </div>
-            
-            {/* Enterprise Plan */}
-            <div className="bg-dark-200/60 backdrop-blur-sm rounded-xl border border-dark-300/50 p-8 shadow-lg hover:shadow-xl transition-all relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/10 to-purple-500/5 rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
-              
-              <h3 className="text-xl font-bold text-white mb-2">Enterprise</h3>
-              <div className="flex items-end mb-6">
-                <span className="text-4xl font-bold text-white">$49</span>
-                <span className="text-gray-400 ml-2 mb-1">/month</span>
-              </div>
-              
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-start">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-300">Everything in Pro plan</span>
-                </li>
-                <li className="flex items-start">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-300">AI interview coach</span>
-                </li>
-                <li className="flex items-start">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-300">Resume analysis & optimization</span>
+                  <span className="text-gray-300">Custom interview scenarios</span>
                 </li>
                 <li className="flex items-start">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-100 mr-3 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
@@ -542,9 +551,19 @@ export default function LandingPage() {
                 </li>
               </ul>
               
-              <Link href="/sign-up" className="block text-center bg-dark-300/80 hover:bg-dark-300 text-white border border-dark-300/50 font-medium rounded-lg px-6 py-3 transition-all">
+              <Link href="/sign-up" className="block text-center bg-gradient-to-r from-primary-200 to-primary-300 hover:from-primary-300 hover:to-primary-200 text-dark-100 font-medium rounded-lg px-6 py-3 transition-all shadow-lg hover:shadow-primary-200/20 hover:shadow-xl">
                 Get Started
               </Link>
+            </div>
+          </div>
+          
+          {/* Credit explanation */}
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center bg-dark-200/60 backdrop-blur-sm rounded-full px-6 py-3 border border-dark-300/50">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-200 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              <span className="text-gray-300 text-sm"><span className="text-primary-200 font-medium">1 credit = 5 minutes</span> of interview time. Credits reset monthly.</span>
             </div>
           </div>
         </div>

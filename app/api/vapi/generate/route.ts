@@ -6,6 +6,7 @@ import { getRandomInterviewCover } from "@/lib/utils";
 import console from "console";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import { NextResponse } from "next/server";
+import { incrementInterviewCount, checkCredits } from "@/lib/actions/subscription.action";
 
 // export async function POST(request: Request) {
 //   try {
@@ -184,11 +185,15 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
+    // Get the URL to extract query parameters
+    const url = new URL(request.url);
+    
     // Parse the request body
     const body = await request.json();
     
     // Log the entire body for debugging
     console.log('API received full body:', JSON.stringify(body, null, 2));
+    console.log('URL parameters:', Object.fromEntries(url.searchParams));
     
     // Extract parameters with defaults
     const type = body.type || 'mixed';
@@ -200,30 +205,38 @@ export async function POST(request: Request) {
     // Extract userId from all possible locations
     let userid = null;
     
-    // Check for userid in the main body
-    if (body.userid) {
-      userid = body.userid;
-      console.log('Found userid in body.userid:', userid);
+    // First priority: Check URL parameters (highest priority)
+    if (url.searchParams.get('userId')) {
+      userid = url.searchParams.get('userId');
+      console.log('Found userid in URL parameter userId:', userid);
     }
-    // Check for userId (camelCase) in the main body
+    else if (url.searchParams.get('userid')) {
+      userid = url.searchParams.get('userid');
+      console.log('Found userid in URL parameter userid:', userid);
+    }
+    // Second priority: Check body parameters
     else if (body.userId) {
       userid = body.userId;
       console.log('Found userid in body.userId:', userid);
     }
-    // Check for user_id (snake_case) in the main body
+    else if (body.userid) {
+      userid = body.userid;
+      console.log('Found userid in body.userid:', userid);
+    }
+    // Third priority: Check for user_id (snake_case) in the main body
     else if (body.user_id) {
       userid = body.user_id;
       console.log('Found userid in body.user_id:', userid);
     }
-    // Check in variableValues (VAPI specific)
+    // Last priority: Check in variableValues (VAPI specific)
     else if (body.variableValues) {
-      if (body.variableValues.userid) {
-        userid = body.variableValues.userid;
-        console.log('Found userid in body.variableValues.userid:', userid);
-      }
-      else if (body.variableValues.userId) {
+      if (body.variableValues.userId) {
         userid = body.variableValues.userId;
         console.log('Found userid in body.variableValues.userId:', userid);
+      }
+      else if (body.variableValues.userid) {
+        userid = body.variableValues.userid;
+        console.log('Found userid in body.variableValues.userid:', userid);
       }
       else if (body.variableValues.user_id) {
         userid = body.variableValues.user_id;
@@ -233,6 +246,22 @@ export async function POST(request: Request) {
     
     // Log the extracted userid
     console.log('Final extracted userid:', userid);
+    
+    // Check if user has credits before generating interview
+    if (userid) {
+      const creditCheck = await checkCredits(userid);
+      console.log('Credit check result:', creditCheck);
+      
+      if (!creditCheck.hasCredits) {
+        return Response.json({ 
+          success: false, 
+          error: 'No credits remaining',
+          message: 'You have used all your credits for this month. Please upgrade your plan for more credits.',
+          creditsUsed: creditCheck.creditsUsed,
+          creditsLimit: creditCheck.creditsLimit
+        }, { status: 403 });
+      }
+    }
     
     const { text: questions } = await generateText({
       model: google("gemini-2.0-flash-001"),
@@ -259,31 +288,85 @@ export async function POST(request: Request) {
     
     console.log('Using userid for interview:', userid);
     
+    // Ensure userid is a string and not a template literal or placeholder
+    if (typeof userid === 'string' && (userid.includes('{{') || userid.includes('}}') || userid === '{{ userid }}')) {
+      console.error('Error: userId appears to be a template literal:', userid);
+      return Response.json({ success: false, error: 'Invalid userId format' }, { status: 400 });
+    }
+    
     const interview = {
       role: role,
       type: type,
       level: level,
       techstack: Array.isArray(techstack) ? techstack : techstack.split(","),
       questions: JSON.parse(questions),
-      // Set userId directly with the extracted value
+      // Set userId in camelCase format (primary field used by the app)
       userId: userid,
-      // Also set it in lowercase format for compatibility
+      // Also set it in lowercase format for compatibility with older code
       userid: userid,
       finalized: true,
       coverImage: getRandomInterviewCover(),
       createdAt: new Date().toISOString(),
     };
     
+    // Additional validation log
+    console.log('Interview object userId validation:', {
+      userId: interview.userId,
+      userid: interview.userid,
+      isTemplate: typeof interview.userId === 'string' && interview.userId.includes('{{'),
+      type: typeof interview.userId
+    });
+    
     // Log the interview object before saving
     console.log('Saving interview with userId:', interview.userId);
 
     const docRef = await db.collection("interviews").add(interview);
     console.log('Interview created with ID:', docRef.id);
+    
+    // Increment the user's interview count
+    const incrementResult = await incrementInterviewCount(userid);
+    console.log('Interview count increment result:', incrementResult);
+    
+    // Verify the interview was saved correctly by reading it back
+    const savedDoc = await db.collection("interviews").doc(docRef.id).get();
+    if (savedDoc.exists) {
+      const savedData = savedDoc.data();
+      console.log('Verification - saved interview data:', {
+        id: docRef.id,
+        userId: savedData?.userId,
+        userid: savedData?.userid,
+        role: savedData?.role,
+        createdAt: savedData?.createdAt
+      });
+      
+      // If userId is not saved correctly, try updating it directly
+      if (!savedData?.userId || savedData.userId !== userid) {
+        console.log('Attempting to fix missing userId with direct update...');
+        await db.collection("interviews").doc(docRef.id).update({
+          userId: userid,
+          userid: userid
+        });
+        
+        // Verify the update worked
+        const updatedDoc = await db.collection("interviews").doc(docRef.id).get();
+        const updatedData = updatedDoc.data();
+        console.log('After update - interview data:', {
+          id: docRef.id,
+          userId: updatedData?.userId,
+          userid: updatedData?.userid
+        });
+      }
+    } else {
+      console.error('Failed to verify saved interview - document not found');
+    }
 
     return Response.json({ success: true, interviewId: docRef.id }, { status: 200 });
   } catch (error) {
     console.error("Error:", error);
-    return Response.json({ success: false, error: error }, { status: 500 });
+    return Response.json({ 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Internal server error' 
+    }, { status: 500 });
   }
 }
 
@@ -304,6 +387,20 @@ export async function GET(request: Request) {
       success: false, 
       error: 'User ID is required as a query parameter' 
     }, { status: 400 });
+  }
+  
+  // Check if user has credits before generating interview
+  const creditCheck = await checkCredits(userId);
+  console.log('GET Credit check result:', creditCheck);
+  
+  if (!creditCheck.hasCredits) {
+    return Response.json({ 
+      success: false, 
+      error: 'No credits remaining',
+      message: 'You have used all your credits for this month. Please upgrade your plan for more credits.',
+      creditsUsed: creditCheck.creditsUsed,
+      creditsLimit: creditCheck.creditsLimit
+    }, { status: 403 });
   }
   
   try {

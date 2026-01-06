@@ -48,14 +48,90 @@ const Agent = ({
   // State to store the created interview ID
   const [createdInterviewId, setCreatedInterviewId] = useState<string>("");
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+  const [showLimitModal, setShowLimitModal] = useState<boolean>(false);
+  const [limitInfo, setLimitInfo] = useState<{ interviewsUsed: number; interviewsLimit: number; plan: string } | null>(null);
+  // Interview duration tracking for credits
+  const [interviewStartTime, setInterviewStartTime] = useState<number | null>(null);
+  const [interviewDuration, setInterviewDuration] = useState<number>(0);
+  const [remainingMinutes, setRemainingMinutes] = useState<number>(0);
+  const [showOutOfCreditsModal, setShowOutOfCreditsModal] = useState<boolean>(false);
+  
+  // Function to create an interview directly via API call
+  const createInterviewDirectly = async () => {
+    if (!userId || userId.trim() === '') {
+      console.error('Warning: Empty userId when creating interview directly');
+      return { success: false, interviewId: null };
+    }
+
+    try {
+      // Log the actual userId value to verify it's not a template literal
+      console.log('Creating interview directly with userId:', userId, 'type:', typeof userId);
+      
+      // Make a direct API call to create the interview with userId in both query params and body
+      const response = await fetch(`/api/vapi/generate?userId=${encodeURIComponent(userId)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userId, // Explicitly use the userId variable
+          userName: userName,
+          // Add role and type to ensure we have all required fields
+          role: 'Software Engineer',
+          type: 'mixed'
+        }),
+      });
+
+      const data = await response.json();
+      console.log('Direct interview creation response:', data);
+      
+      // Handle credit limit error
+      if (response.status === 403 && data.error === 'No credits remaining') {
+        setShowOutOfCreditsModal(true);
+        return { success: false, interviewId: null, noCredits: true };
+      }
+      
+      if (data.success && data.interviewId) {
+        setCreatedInterviewId(data.interviewId);
+        return { success: true, interviewId: data.interviewId };
+      } else {
+        console.error('Failed to create interview directly:', data);
+        return { success: false, interviewId: null };
+      }
+    } catch (error) {
+      console.error('Error creating interview directly:', error);
+      return { success: false, interviewId: null };
+    }
+  };
 
   useEffect(() => {
     const onCallStart = () => {
       setCallStatus(CallStatus.ACTIVE);
+      setInterviewStartTime(Date.now());
     };
 
-    const onCallEnd = () => {
+    const onCallEnd = async () => {
       setCallStatus(CallStatus.FINISHED);
+      
+      // Calculate interview duration and deduct credits
+      if (interviewStartTime) {
+        const durationMs = Date.now() - interviewStartTime;
+        const durationMinutes = Math.ceil(durationMs / 60000); // Round up to nearest minute
+        setInterviewDuration(durationMinutes);
+        
+        // Deduct credits based on duration
+        try {
+          const response = await fetch('/api/credits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ minutesUsed: durationMinutes })
+          });
+          const result = await response.json();
+          console.log('Credits deducted:', result);
+        } catch (error) {
+          console.error('Error deducting credits:', error);
+        }
+      }
     };
 
     const onMessage = (message: any) => {
@@ -151,8 +227,6 @@ const Agent = ({
       setLastMessage(messages[messages.length - 1].content);
     }
 
-    // Function to create an interview directly via API call
-
     const handleGenerateFeedback = async (messages: SavedMessage[]) => {
       console.log("handleGenerateFeedback");
 
@@ -182,34 +256,109 @@ const Agent = ({
     }
   }, [messages, callStatus, feedbackId, interviewId, router, type, userId, createdInterviewId]);
 
+  const checkInterviewLimit = async (): Promise<boolean> => {
+    try {
+      const response = await fetch(`/api/interview/check-limit?userId=${encodeURIComponent(userId)}`);
+      const data = await response.json();
+      
+      if (!data.canCreate) {
+        setLimitInfo({
+          interviewsUsed: data.interviewsUsed,
+          interviewsLimit: data.interviewsLimit,
+          plan: data.plan,
+        });
+        setShowLimitModal(true);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Error checking interview limit:', error);
+      // Allow interview if check fails
+      return true;
+    }
+  };
+
+  const checkCredits = async (): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/credits');
+      const data = await response.json();
+      
+      if (!data.hasCredits) {
+        setRemainingMinutes(0);
+        setShowOutOfCreditsModal(true);
+        return false;
+      }
+      
+      setRemainingMinutes(data.remainingMinutes);
+      return true;
+    } catch (error) {
+      console.error('Error checking credits:', error);
+      return true; // Allow if check fails
+    }
+  };
+
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
 
     if (type === "generate") {
-      console.log('Starting VAPI workflow with userId:', userId);
+      console.log('Starting interview process with userId:', userId);
 
       if (!userId || userId.trim() === '') {
-        console.error('Warning: Empty userId being passed to VAPI workflow');
+        console.error('Warning: Empty userId being passed to workflow');
         alert('Error: User ID is missing. Please log in again.');
         setCallStatus(CallStatus.INACTIVE);
         return;
       }
 
-      try {
-        // Log the user ID being passed to VAPI
-        console.log('Starting VAPI workflow with user ID:', userId);
+      // Check interview limit before proceeding
+      const canProceed = await checkInterviewLimit();
+      if (!canProceed) {
+        setCallStatus(CallStatus.INACTIVE);
+        return;
+      }
 
-        // Use exactly the same format as your friend's implementation
+      // Check credits before proceeding
+      const hasCredits = await checkCredits();
+      if (!hasCredits) {
+        setCallStatus(CallStatus.INACTIVE);
+        return;
+      }
+
+      try {
+        // First create the interview directly via API call
+        const result = await createInterviewDirectly();
+        
+        if (!result.success) {
+          // Don't show generic error if it's a credit issue (modal already shown)
+          if (!('noCredits' in result && result.noCredits)) {
+            alert('Error creating interview. Please try again.');
+          }
+          setCallStatus(CallStatus.INACTIVE);
+          return;
+        }
+        
+        const { interviewId } = result;
+        
+        // After successful interview creation, start the VAPI workflow for voice interaction
+        console.log('Starting VAPI workflow with user ID:', userId, 'and interview ID:', interviewId);
+
+        // Start VAPI workflow separately just for voice interaction
         await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
           variableValues: {
             username: userName,
             userid: userId, // Use lowercase 'userid' exactly as in your friend's code
+            interviewId: interviewId, // Pass the interview ID to VAPI
           },
         });
       } catch (error) {
-        console.error('Error starting VAPI workflow:', error);
-        alert('Error starting interview. Please try again.');
-        setCallStatus(CallStatus.INACTIVE);
+        console.error('Error in interview process:', error);
+        // Show success modal even if VAPI errors out, since the interview was created
+        if (createdInterviewId) {
+          setShowSuccessModal(true);
+        } else {
+          alert('Error starting interview. Please try again.');
+          setCallStatus(CallStatus.INACTIVE);
+        }
       }
     } else {
       // Handle non-generate case
@@ -241,6 +390,81 @@ const Agent = ({
 
   return (
     <div className="flex flex-col items-center w-full">
+      {/* Limit Reached Modal */}
+      {showLimitModal && limitInfo && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70">
+          <div className="bg-dark-200 rounded-xl border border-dark-300 p-6 max-w-md w-full shadow-xl">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Interview Limit Reached</h3>
+              <p className="text-gray-400 mb-2">
+                You've used <span className="text-amber-400 font-semibold">{limitInfo.interviewsUsed}</span> of <span className="text-amber-400 font-semibold">{limitInfo.interviewsLimit}</span> interviews this month on the <span className="text-primary-200 font-semibold">{limitInfo.plan}</span> plan.
+              </p>
+              <p className="text-gray-400 mb-6">Upgrade your plan to continue practicing and improve your interview skills.</p>
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
+                <button 
+                  onClick={() => router.push('/billing')}
+                  className="flex-1 bg-primary-200 hover:bg-primary-300 text-dark-100 font-medium py-2 px-4 rounded-lg transition-colors"
+                >
+                  Upgrade Plan
+                </button>
+                <button 
+                  onClick={() => setShowLimitModal(false)}
+                  className="flex-1 bg-dark-300 hover:bg-dark-400 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Out of Credits Modal */}
+      {showOutOfCreditsModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70">
+          <div className="bg-dark-200 rounded-xl border border-dark-300 p-6 max-w-md w-full shadow-xl">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Out of Credits</h3>
+              <p className="text-gray-400 mb-2">
+                You've used all your interview credits for this month.
+              </p>
+              <p className="text-gray-400 mb-4">
+                <span className="text-primary-200 font-medium">1 credit = 5 minutes</span> of interview time
+              </p>
+              <p className="text-gray-400 mb-6">Upgrade your plan to get more credits and continue practicing.</p>
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
+                <button 
+                  onClick={() => router.push('/billing')}
+                  className="flex-1 bg-primary-200 hover:bg-primary-300 text-dark-100 font-medium py-2 px-4 rounded-lg transition-colors"
+                >
+                  Upgrade Plan
+                </button>
+                <button 
+                  onClick={() => setShowOutOfCreditsModal(false)}
+                  className="flex-1 bg-dark-300 hover:bg-dark-400 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Success Modal */}
       {showSuccessModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/70">

@@ -1,5 +1,5 @@
 import { db } from "@/firebase/admin";
-import { stripe, PlanType, PLANS } from "@/lib/stripe";
+import { stripe, PlanType, PLANS, MINUTES_PER_CREDIT } from "@/lib/stripe";
 
 interface UpdateUserSubscriptionParams {
   userId: string;
@@ -26,12 +26,15 @@ export async function updateUserSubscription({
       throw new Error(`User with ID ${userId} not found`);
     }
 
-    // Calculate interview limit based on plan
+    // Calculate limits based on plan
     const interviewsLimit = PLANS[plan].maxInterviews;
+    const creditsLimit = PLANS[plan].monthlyCredits;
     
     // Get current subscription data if it exists
     const userData = userDoc.data();
     const currentInterviewsUsed = userData?.subscription?.interviewsUsed || 0;
+    const currentCreditsUsed = userData?.subscription?.creditsUsed || 0;
+    const currentMinutesUsed = userData?.subscription?.minutesUsed || 0;
 
     // Update user subscription data
     await userRef.update({
@@ -43,6 +46,9 @@ export async function updateUserSubscription({
         currentPeriodEnd: currentPeriodEnd || userData?.subscription?.currentPeriodEnd,
         interviewsUsed: currentInterviewsUsed,
         interviewsLimit,
+        creditsUsed: currentCreditsUsed,
+        creditsLimit,
+        minutesUsed: currentMinutesUsed,
         updatedAt: Date.now(),
       }
     });
@@ -104,17 +110,31 @@ export async function getUserSubscription(userId: string) {
     }
 
     const userData = userDoc.data();
-    const subscription = userData?.subscription || {
-      status: 'active',
-      plan: 'FREE',
-      interviewsUsed: 0,
-      interviewsLimit: PLANS.FREE.maxInterviews
+    const plan = userData?.subscription?.plan || 'FREE';
+    const planConfig = PLANS[plan as keyof typeof PLANS] || PLANS.FREE;
+    
+    const subscription = {
+      status: userData?.subscription?.status || 'active',
+      plan,
+      interviewsUsed: userData?.subscription?.interviewsUsed || 0,
+      interviewsLimit: userData?.subscription?.interviewsLimit || planConfig.maxInterviews,
+      creditsUsed: userData?.subscription?.creditsUsed || 0,
+      creditsLimit: userData?.subscription?.creditsLimit || planConfig.monthlyCredits,
+      minutesUsed: userData?.subscription?.minutesUsed || 0,
+      stripeCustomerId: userData?.subscription?.stripeCustomerId,
+      stripeSubscriptionId: userData?.subscription?.stripeSubscriptionId,
+      currentPeriodEnd: userData?.subscription?.currentPeriodEnd,
     };
+
+    const remainingCredits = subscription.creditsLimit - subscription.creditsUsed;
+    const remainingMinutes = remainingCredits * MINUTES_PER_CREDIT;
 
     return { 
       success: true, 
       subscription,
-      remainingInterviews: subscription.interviewsLimit - subscription.interviewsUsed
+      remainingInterviews: subscription.interviewsLimit - subscription.interviewsUsed,
+      remainingCredits,
+      remainingMinutes
     };
   } catch (error) {
     console.error('Error getting user subscription:', error);
@@ -125,8 +145,13 @@ export async function getUserSubscription(userId: string) {
         status: 'active',
         plan: 'FREE',
         interviewsUsed: 0,
-        interviewsLimit: PLANS.FREE.maxInterviews
-      }
+        interviewsLimit: PLANS.FREE.maxInterviews,
+        creditsUsed: 0,
+        creditsLimit: PLANS.FREE.monthlyCredits,
+        minutesUsed: 0
+      },
+      remainingCredits: PLANS.FREE.monthlyCredits,
+      remainingMinutes: PLANS.FREE.monthlyCredits * MINUTES_PER_CREDIT
     };
   }
 }
@@ -202,12 +227,103 @@ export async function resetInterviewCount(userId: string) {
     const userRef = db.collection('users').doc(userId);
     
     await userRef.update({
-      'subscription.interviewsUsed': 0
+      'subscription.interviewsUsed': 0,
+      'subscription.creditsUsed': 0,
+      'subscription.minutesUsed': 0
     });
 
     return { success: true };
   } catch (error) {
     console.error('Error resetting interview count:', error);
     return { success: false, error };
+  }
+}
+
+// Deduct credits based on minutes used in an interview
+export async function deductCredits(userId: string, minutesUsed: number) {
+  try {
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) {
+      throw new Error(`User with ID ${userId} not found`);
+    }
+
+    const userData = userDoc.data();
+    const plan = userData?.subscription?.plan || 'FREE';
+    const planConfig = PLANS[plan as keyof typeof PLANS] || PLANS.FREE;
+    
+    const currentCreditsUsed = userData?.subscription?.creditsUsed || 0;
+    const creditsLimit = userData?.subscription?.creditsLimit || planConfig.monthlyCredits;
+    const currentMinutesUsed = userData?.subscription?.minutesUsed || 0;
+    
+    // Calculate credits to deduct (1 credit = 5 minutes)
+    const creditsToDeduct = minutesUsed / MINUTES_PER_CREDIT;
+    const newCreditsUsed = currentCreditsUsed + creditsToDeduct;
+    const newMinutesUsed = currentMinutesUsed + minutesUsed;
+
+    // Update credits
+    await userRef.update({
+      'subscription.creditsUsed': newCreditsUsed,
+      'subscription.minutesUsed': newMinutesUsed
+    });
+
+    return { 
+      success: true, 
+      creditsUsed: newCreditsUsed,
+      creditsLimit,
+      remainingCredits: creditsLimit - newCreditsUsed,
+      minutesUsed: newMinutesUsed,
+      remainingMinutes: (creditsLimit - newCreditsUsed) * MINUTES_PER_CREDIT
+    };
+  } catch (error) {
+    console.error('Error deducting credits:', error);
+    return { success: false, error };
+  }
+}
+
+// Check if user has enough credits for an interview
+export async function checkCredits(userId: string) {
+  try {
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) {
+      throw new Error(`User with ID ${userId} not found`);
+    }
+
+    const userData = userDoc.data();
+    const plan = userData?.subscription?.plan || 'FREE';
+    const planConfig = PLANS[plan as keyof typeof PLANS] || PLANS.FREE;
+    
+    const creditsUsed = userData?.subscription?.creditsUsed || 0;
+    const creditsLimit = userData?.subscription?.creditsLimit || planConfig.monthlyCredits;
+    const remainingCredits = creditsLimit - creditsUsed;
+    const remainingMinutes = remainingCredits * MINUTES_PER_CREDIT;
+
+    // Check if user has at least some credits remaining
+    const hasCredits = remainingCredits > 0;
+
+    return { 
+      success: true, 
+      hasCredits,
+      creditsUsed,
+      creditsLimit,
+      remainingCredits,
+      remainingMinutes,
+      plan
+    };
+  } catch (error) {
+    console.error('Error checking credits:', error);
+    return { 
+      success: false, 
+      error,
+      hasCredits: false,
+      creditsUsed: 0,
+      creditsLimit: 0,
+      remainingCredits: 0,
+      remainingMinutes: 0,
+      plan: 'FREE'
+    };
   }
 }

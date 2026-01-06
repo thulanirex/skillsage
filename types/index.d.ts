@@ -38,12 +38,15 @@ interface User {
   id: string;
   subscription?: {
     status: 'active' | 'canceled' | 'incomplete' | 'past_due' | 'trialing' | 'unpaid';
-    plan: 'FREE' | 'PRO' | 'ENTERPRISE';
+    plan: 'FREE' | 'STANDARD' | 'PROFESSIONAL';
     currentPeriodEnd?: number;
     stripeCustomerId?: string;
     stripeSubscriptionId?: string;
     interviewsUsed?: number;
     interviewsLimit?: number;
+    creditsUsed?: number;
+    creditsLimit?: number;
+    minutesUsed?: number;
   };
 }
 

@@ -1,22 +1,7 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import AuthFormWrapper from "@/components/AuthFormWrapper";
 
 const Page = () => {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to waitlist page
-    router.replace("/waitlist");
-  }, [router]);
-
-  // Return a loading state while redirecting
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <p className="text-white">Redirecting to waitlist...</p>
-    </div>
-  );
+  return <AuthFormWrapper type="sign-up" />;
 };
 
 export default Page;

@@ -125,8 +125,8 @@ export async function getCurrentUser(): Promise<User | null> {
       ...userRecord.data(),
       id: userRecord.id,
     } as User;
-  } catch (error) {
-    console.error('Error verifying session or getting user data:', error);
+  } catch (error: any) {
+    console.error('Error verifying session or getting user data:', error?.message || error?.code || JSON.stringify(error));
 
     // Invalid or expired session
     return null;

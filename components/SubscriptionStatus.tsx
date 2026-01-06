@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { PLANS } from "@/lib/stripe";
+import { PLANS, MINUTES_PER_CREDIT } from "@/lib/stripe";
 
 interface SubscriptionStatusProps {
   userId: string;
@@ -13,7 +13,9 @@ const SubscriptionStatus = ({ userId }: SubscriptionStatusProps) => {
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState<any>(null);
   const [remainingInterviews, setRemainingInterviews] = useState(0);
-  const [percentUsed, setPercentUsed] = useState(0);
+  const [remainingCredits, setRemainingCredits] = useState(0);
+  const [remainingMinutes, setRemainingMinutes] = useState(0);
+  const [creditsPercentUsed, setCreditsPercentUsed] = useState(0);
 
   useEffect(() => {
     const fetchSubscription = async () => {
@@ -25,11 +27,13 @@ const SubscriptionStatus = ({ userId }: SubscriptionStatusProps) => {
         if (result.success) {
           setSubscription(result.subscription);
           setRemainingInterviews(result.remainingInterviews);
+          setRemainingCredits(result.remainingCredits || 0);
+          setRemainingMinutes(result.remainingMinutes || 0);
           
-          // Calculate percentage used
-          const total = result.subscription.interviewsLimit || PLANS.FREE.maxInterviews;
-          const used = result.subscription.interviewsUsed || 0;
-          setPercentUsed(Math.min(Math.round((used / total) * 100), 100));
+          // Calculate credits percentage used
+          const creditsTotal = result.subscription.creditsLimit || PLANS.FREE.monthlyCredits;
+          const creditsUsed = result.subscription.creditsUsed || 0;
+          setCreditsPercentUsed(Math.min(Math.round((creditsUsed / creditsTotal) * 100), 100));
         }
       } catch (error) {
         console.error("Error fetching subscription:", error);
@@ -97,26 +101,45 @@ const SubscriptionStatus = ({ userId }: SubscriptionStatusProps) => {
             )}
           </div>
           
-          {/* Usage Statistics */}
-          <div className="mt-6 space-y-3">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-300">Interviews Used</span>
-              <span className="text-white font-medium">
-                {subscription?.interviewsUsed || 0} / {subscription?.interviewsLimit || PLANS.FREE.maxInterviews}
-              </span>
+          {/* Credits Usage */}
+          <div className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-300">Credits Used</span>
+                <span className="text-white font-medium">
+                  {subscription?.creditsUsed?.toFixed(1) || 0} / {subscription?.creditsLimit || PLANS.FREE.monthlyCredits}
+                </span>
+              </div>
+              <Progress value={creditsPercentUsed} className="h-2 bg-dark-400" indicatorClassName="bg-primary-200" />
+              <p className="text-xs text-gray-400">
+                {remainingCredits.toFixed(1)} credits ({remainingMinutes.toFixed(0)} mins) remaining
+              </p>
             </div>
-            <Progress value={percentUsed} className="h-2 bg-dark-400" indicatorClassName="bg-primary-200" />
             
-            <p className="text-xs text-gray-400 mt-1">
-              {remainingInterviews} {remainingInterviews === 1 ? "interview" : "interviews"} remaining this month
-            </p>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-300">Interview Sessions</span>
+                <span className="text-white font-medium">
+                  {subscription?.interviewsUsed || 0} / {subscription?.interviewsLimit || PLANS.FREE.maxInterviews}
+                </span>
+              </div>
+              <p className="text-xs text-gray-400">
+                {remainingInterviews} {remainingInterviews === 1 ? "session" : "sessions"} remaining this month
+              </p>
+            </div>
+
+            <div className="bg-dark-400/50 rounded-lg p-3 mt-4">
+              <p className="text-xs text-gray-300">
+                <span className="text-primary-200 font-medium">1 credit = 5 minutes</span> of interview time
+              </p>
+            </div>
           </div>
           
           {/* Plan Features */}
           <div className="mt-6">
             <h4 className="text-sm font-medium text-white mb-3">Plan Features</h4>
             <ul className="space-y-2">
-              {PLANS[(subscription?.plan as keyof typeof PLANS) || "FREE"].features.map((feature: string, index: number) => (
+              {(PLANS[subscription?.plan as keyof typeof PLANS] || PLANS.FREE).features.map((feature: string, index: number) => (
                 <li key={index} className="flex items-start text-sm">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-primary-200 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>

@@ -11,10 +11,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 
 import TextLogo from "./TextLogo";
+import { useRecaptcha } from "./RecaptchaProvider";
 
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendEmailVerification,
 } from "firebase/auth";
 
 import { Form } from "@/components/ui/form";
@@ -34,6 +36,7 @@ const authFormSchema = (type: FormType) => {
 const AuthForm = ({ type }: { type: FormType }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { executeRecaptcha, isLoaded: recaptchaLoaded } = useRecaptcha();
 
   const formSchema = authFormSchema(type);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -52,11 +55,35 @@ const AuthForm = ({ type }: { type: FormType }) => {
       if (type === "sign-up") {
         const { name, email, password } = data;
 
+        // Verify with reCAPTCHA and rate limiting
+        const recaptchaToken = await executeRecaptcha('signup');
+        
+        const verifyResponse = await fetch('/api/auth/verify-signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recaptchaToken }),
+        });
+
+        if (!verifyResponse.ok) {
+          const errorData = await verifyResponse.json();
+          if (verifyResponse.status === 429) {
+            toast.error(errorData.message || 'Too many attempts. Please try again later.');
+          } else if (verifyResponse.status === 403) {
+            toast.error('Security verification failed. Please try again.');
+          } else {
+            toast.error('Verification failed. Please try again.');
+          }
+          return;
+        }
+
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
           password
         );
+
+        // Send email verification
+        await sendEmailVerification(userCredential.user);
 
         const result = await signUp({
           uid: userCredential.user.uid,
@@ -70,16 +97,49 @@ const AuthForm = ({ type }: { type: FormType }) => {
           return;
         }
 
-        toast.success("Account created successfully. Please sign in.");
-        router.push("/sign-in");
+        toast.success("Account created! Please check your email to verify your account.");
+        
+        // Sign in the user automatically after sign-up
+        const idToken = await userCredential.user.getIdToken();
+        await signIn({
+          email,
+          idToken,
+        });
+        
+        // Redirect to email verification page
+        router.push("/verify-email");
       } else {
         const { email, password } = data;
+
+        // Check rate limit for sign-in
+        const verifyResponse = await fetch('/api/auth/verify-signin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        if (!verifyResponse.ok) {
+          const errorData = await verifyResponse.json();
+          if (verifyResponse.status === 429) {
+            toast.error(errorData.message || 'Too many attempts. Please try again later.');
+          } else {
+            toast.error('Verification failed. Please try again.');
+          }
+          return;
+        }
 
         const userCredential = await signInWithEmailAndPassword(
           auth,
           email,
           password
         );
+
+        // Check if email is verified
+        if (!userCredential.user.emailVerified) {
+          toast.error("Please verify your email before signing in.");
+          router.push("/verify-email");
+          return;
+        }
 
         const idToken = await userCredential.user.getIdToken();
         if (!idToken) {

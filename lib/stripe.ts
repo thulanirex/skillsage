@@ -11,43 +11,55 @@ export const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2025-04-30.basil', // Updated to the latest API version as of May 2025
 });
 
+// 1 credit = 5 minutes of interview time
+export const CREDITS_PER_MINUTE = 0.2; // 1/5 = 0.2 credits per minute
+export const MINUTES_PER_CREDIT = 5;
+
 export const PLANS = {
   FREE: {
     name: 'Free',
     price: 0,
     features: [
-      '3 AI interviews per month',
+      '1 credit per month (5 minutes)',
+      '1 AI interview session',
       'Basic feedback',
       'Limited question types',
     ],
-    stripePriceId: '',
-    maxInterviews: 3,
+    stripePriceId: 'price_1SmevJDYQwQyH52AunGSWd1D',
+    maxInterviews: 1,
+    monthlyCredits: 1,
+    maxMinutesPerInterview: 5,
   },
-  PRO: {
-    name: 'Pro',
+  STANDARD: {
+    name: 'Standard',
+    price: 9.99,
+    features: [
+      '5 credits per month (25 minutes)',
+      '5 AI interview sessions',
+      'Detailed feedback',
+      'All question types',
+      'Interview history',
+    ],
+    stripePriceId: 'price_1SmewSDYQwQyH52AI7jZ3uxi',
+    maxInterviews: 5,
+    monthlyCredits: 5,
+    maxMinutesPerInterview: 25,
+  },
+  PROFESSIONAL: {
+    name: 'Professional',
     price: 19.99,
     features: [
-      'Unlimited AI interviews',
+      '15 credits per month (75 minutes)',
+      '15 AI interview sessions',
       'Detailed feedback and analytics',
       'All question types',
       'Custom interview scenarios',
       'Priority support',
     ],
-    stripePriceId: 'price_1RKQKYDYQwQyH52AU3XqkwNd', // Pro plan price ID
-    maxInterviews: Infinity,
-  },
-  ENTERPRISE: {
-    name: 'Enterprise',
-    price: 49.99,
-    features: [
-      'Everything in Pro',
-      'Team management',
-      'Custom branding',
-      'Advanced analytics',
-      'Dedicated account manager',
-    ],
-    stripePriceId: 'price_1RKQLTDYQwQyH52AUhTJjGh7', // Enterprise plan price ID
-    maxInterviews: Infinity,
+    stripePriceId: 'price_1SmexGDYQwQyH52AaejYRNW3',
+    maxInterviews: 15,
+    monthlyCredits: 15,
+    maxMinutesPerInterview: 75,
   },
 };
 

@@ -11,9 +11,38 @@ import InterviewPrivacyToggle from "@/components/InterviewPrivacyToggle";
 
 export default async function MyInterviewsPage() {
   const user = await getCurrentUser();
+  
+  // Add debugging to log the user ID
+  console.log('MyInterviewsPage - User ID:', user?.id);
+  
   const { interviews, feedbackMap } = await getUserInterviewsWithFeedback(user?.id);
   
+  // Log the number of interviews returned
+  console.log(`MyInterviewsPage - Received ${interviews.length} interviews`);
+  if (interviews.length > 0) {
+    console.log('First interview:', {
+      id: interviews[0].id,
+      userId: interviews[0].userId,
+      role: interviews[0].role
+    });
+  }
+  
+  // Check for and log duplicate interview IDs
+  const seen = new Set<string>();
+  const duplicateIds = new Set<string>();
+  
+  interviews.forEach(interview => {
+    if (seen.has(interview.id)) {
+      duplicateIds.add(interview.id);
+      console.log(`Found duplicate interview ID: ${interview.id}`);
+    }
+    seen.add(interview.id);
+  });
+  
+  console.log(`Found ${duplicateIds.size} duplicate interview IDs`);
+  
   // Separate interviews into completed and pending
+  // For each interview, ensure we use a unique key in the render function
   const completedInterviews = interviews.filter(interview => feedbackMap[interview.id]);
   const pendingInterviews = interviews.filter(interview => !feedbackMap[interview.id]);
 
@@ -114,9 +143,9 @@ export default async function MyInterviewsPage() {
         <TabsContent value="all" className="space-y-6">
           {interviews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {interviews.map((interview) => (
+              {interviews.map((interview, index) => (
                 <InterviewCard 
-                  key={`all-${interview.id}`}
+                  key={`all-tab-${interview.id}-${index}`}
                   interview={interview}
                   feedback={feedbackMap[interview.id]}
                   userId={user?.id}
@@ -131,9 +160,9 @@ export default async function MyInterviewsPage() {
         <TabsContent value="completed" className="space-y-6">
           {completedInterviews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {completedInterviews.map((interview) => (
+              {completedInterviews.map((interview, index) => (
                 <InterviewCard 
-                  key={`completed-${interview.id}`}
+                  key={`completed-tab-${interview.id}-${index}`}
                   interview={interview}
                   feedback={feedbackMap[interview.id]}
                   userId={user?.id}
@@ -148,9 +177,9 @@ export default async function MyInterviewsPage() {
         <TabsContent value="pending" className="space-y-6">
           {pendingInterviews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pendingInterviews.map((interview) => (
+              {pendingInterviews.map((interview, index) => (
                 <InterviewCard 
-                  key={`pending-${interview.id}`}
+                  key={`pending-tab-${interview.id}-${index}`}
                   interview={interview}
                   feedback={feedbackMap[interview.id]}
                   userId={user?.id}

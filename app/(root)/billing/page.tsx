@@ -58,20 +58,48 @@ const BillingPage = async () => {
             </div>
             
             <div className="p-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Pro Plan */}
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Free Plan */}
                 <div className="bg-dark-300/50 backdrop-blur-sm rounded-xl border border-dark-300 p-6 relative overflow-hidden">
                   <div className="relative z-10">
-                    <h3 className="text-xl font-bold text-white mb-2">{PLANS.PRO.name} Plan</h3>
-                    <p className="text-gray-300 text-sm mb-4">Perfect for professionals</p>
+                    <h3 className="text-xl font-bold text-white mb-2">{PLANS.FREE.name} Plan</h3>
+                    <p className="text-gray-300 text-sm mb-4">Get started for free</p>
                     
                     <div className="flex items-baseline mb-6">
-                      <span className="text-3xl font-bold text-white">${PLANS.PRO.price}</span>
+                      <span className="text-3xl font-bold text-white">${PLANS.FREE.price}</span>
                       <span className="text-sm text-gray-300 ml-1">/month</span>
                     </div>
                     
                     <div className="space-y-3 mb-6">
-                      {PLANS.PRO.features.map((feature, index) => (
+                      {PLANS.FREE.features.map((feature, index) => (
+                        <div key={index} className="flex items-start">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                          <span className="text-sm text-gray-300">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <Button className="w-full bg-dark-400 hover:bg-dark-500 text-white" disabled>
+                      Current Plan
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Standard Plan */}
+                <div className="bg-dark-300/50 backdrop-blur-sm rounded-xl border border-dark-300 p-6 relative overflow-hidden">
+                  <div className="relative z-10">
+                    <h3 className="text-xl font-bold text-white mb-2">{PLANS.STANDARD.name} Plan</h3>
+                    <p className="text-gray-300 text-sm mb-4">For regular practice</p>
+                    
+                    <div className="flex items-baseline mb-6">
+                      <span className="text-3xl font-bold text-white">${PLANS.STANDARD.price}</span>
+                      <span className="text-sm text-gray-300 ml-1">/month</span>
+                    </div>
+                    
+                    <div className="space-y-3 mb-6">
+                      {PLANS.STANDARD.features.map((feature, index) => (
                         <div key={index} className="flex items-start">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary-200 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="20 6 9 17 4 12"></polyline>
@@ -81,65 +109,48 @@ const BillingPage = async () => {
                       ))}
                     </div>
                     
-                    <CheckoutButton priceId={PLANS.PRO.stripePriceId} userEmail={user.email} />
+                    <CheckoutButton priceId={PLANS.STANDARD.stripePriceId} userEmail={user.email} />
                   </div>
                   
-                  {/* Background decoration */}
                   <div className="absolute top-0 right-0 h-24 w-24 -mr-8 -mt-8 bg-primary-200/10 rounded-full blur-xl"></div>
                 </div>
                 
-                {/* Enterprise Plan */}
+                {/* Professional Plan */}
                 <div className="bg-gradient-to-br from-primary-200/30 to-primary-400/20 backdrop-blur-sm rounded-xl border border-primary-300/30 p-6 relative overflow-hidden">
                   <div className="absolute top-3 right-3">
-                    <span className="bg-primary-200 text-dark-100 text-xs px-2.5 py-1 rounded-full font-medium">POPULAR</span>
+                    <span className="bg-primary-200 text-dark-100 text-xs px-2.5 py-1 rounded-full font-medium">BEST VALUE</span>
                   </div>
                   
                   <div className="relative z-10">
-                    <h3 className="text-xl font-bold text-white mb-2">{PLANS.ENTERPRISE.name} Plan</h3>
-                    <p className="text-gray-300 text-sm mb-4">For teams and businesses</p>
+                    <h3 className="text-xl font-bold text-white mb-2">{PLANS.PROFESSIONAL.name} Plan</h3>
+                    <p className="text-gray-300 text-sm mb-4">For serious job seekers</p>
                     
                     <div className="flex items-baseline mb-6">
-                      <span className="text-3xl font-bold text-white">${PLANS.ENTERPRISE.price}</span>
+                      <span className="text-3xl font-bold text-white">${PLANS.PROFESSIONAL.price}</span>
                       <span className="text-sm text-gray-300 ml-1">/month</span>
                     </div>
                     
-                    <ul className="space-y-3 mb-6">
-                      <li className="flex items-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary-200 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span className="text-gray-300">Everything in Pro plan</span>
-                      </li>
-                      <li className="flex items-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary-200 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span className="text-gray-300">AI-powered resume analysis and optimization</span>
-                      </li>
-                      <li className="flex items-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary-200 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span className="text-gray-300">Monthly 1-on-1 coaching sessions with industry experts</span>
-                      </li>
-                      <li className="flex items-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary-200 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span className="text-gray-300">Priority support and personalized interview strategies</span>
-                      </li>
-                    </ul>
+                    <div className="space-y-3 mb-6">
+                      {PLANS.PROFESSIONAL.features.map((feature, index) => (
+                        <div key={index} className="flex items-start">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary-200 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                          <span className="text-sm text-gray-300">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
                     
                     <CheckoutButton 
-                      priceId={PLANS.ENTERPRISE.stripePriceId}
+                      priceId={PLANS.PROFESSIONAL.stripePriceId}
                       userEmail={user.email}
-                      className="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-dark-100 font-medium py-2.5"
+                      className="w-full bg-gradient-to-r from-primary-200 to-primary-300 hover:from-primary-300 hover:to-primary-400 text-dark-100 font-medium py-2.5"
                     >
-                      Upgrade to Enterprise
+                      Upgrade to Professional
                     </CheckoutButton>
                   </div>
                   
-                  <div className="absolute top-0 right-0 h-24 w-24 -mr-6 -mt-6 bg-amber-500/10 rounded-full blur-xl"></div>
+                  <div className="absolute top-0 right-0 h-24 w-24 -mr-6 -mt-6 bg-primary-200/10 rounded-full blur-xl"></div>
                 </div>
               </div>
             </div>
